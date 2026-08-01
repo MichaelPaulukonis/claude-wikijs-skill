@@ -69,6 +69,19 @@ Dependency: `requests`. Declared in `requirements.txt`
 would need a hand-rolled encoder, which is more risk than a one-line `pip install`
 is worth.)
 
+One functional fix, made now as part of this packaging pass (not deferred):
+**`update` currently cannot change tags.** It fetches the page's existing tags and
+passes them straight back unchanged (see the comment at `wikijs.py:99-101`) — there
+is no way to add, remove, or replace tags via the CLI today. Add a `--tags`
+flag to `update`, matching `create`'s comma-separated syntax:
+
+- `update <ref> --tags a,b,c` — replaces the page's tag list with `[a, b, c]`
+- `--tags ""` — clears all tags
+- `--tags` omitted — current behavior unchanged (existing tags preserved)
+- Combinable with `--append`/`--replace`/`--append-file`/`--replace-file` in the
+  same invocation, since tags and content are independent fields on the same
+  mutation.
+
 ## Component: `SKILL.md`
 
 Adapted from the current `dot-files` version with these changes:
@@ -88,9 +101,17 @@ Adapted from the current `dot-files` version with these changes:
    > Wiki.js 2.x only. This wraps the 2.x GraphQL schema (`pages.singleByPath`,
    > `assets.folders`, etc). Wiki.js 3.x uses a different, still-beta schema and is
    > not supported.
-5. **Keep the "Commands" and "Quirks" sections as-is.** These document genuine 2.x
-   API behavior (stale search ids, no folder delete, asset move workaround, `.md`
-   upload trap, etc.) — useful to any user of this skill, not personal habit.
+5. **Add an explicit markup-support note:** pages are created/updated with
+   `editor: "markdown"` hardcoded (`wikijs.py:82`, `:117`) — this skill only
+   supports Markdown-edited pages today, even though Wiki.js 2.x also offers
+   HTML and CKEditor page editors. Document this as a current limitation, with a
+   pointer to the Future Work section below (not fixed in this pass).
+6. **Document the new `update --tags` flag** (see `wikijs.py` component above) in
+   the Commands reference.
+7. **Keep the rest of the "Commands" and "Quirks" sections as-is.** These document
+   genuine 2.x API behavior (stale search ids, no folder delete, asset move
+   workaround, `.md` upload trap, etc.) — useful to any user of this skill, not
+   personal habit.
 
 ## Component: `docs/journal-convention-example.md`
 
@@ -162,6 +183,18 @@ Minimal manifests per Claude Code plugin conventions:
 }
 ```
 
+## Future work (deferred until this packaging pass is done and working)
+
+- **Test suite** covering the CLI end-to-end against a real Wiki.js 2.x instance:
+  create/get/update/search/list/delete for pages, tag add/modify (once `--tags`
+  ships), move/rename, upload/assets/delete-asset/rename-asset. No test framework
+  chosen yet — pick one when this work starts.
+- **Multi-editor support**: add HTML/CKEditor page support (currently hardcoded to
+  `editor: "markdown"`), with tests covering each supported editor type.
+
+Both are real, wanted follow-ups — just sequenced after the base packaging/release
+work in this spec, not blocking it.
+
 ## Out of scope
 
 - Migrating `dot-files` to install this as a plugin (deferred until the standalone
@@ -169,5 +202,3 @@ Minimal manifests per Claude Code plugin conventions:
 - Wiki.js 3.x support.
 - Publishing to any Claude Code plugin marketplace listing beyond the repo's own
   self-referencing marketplace.
-- CI/tests — the script has no existing test suite; not adding one as part of this
-  packaging effort.
