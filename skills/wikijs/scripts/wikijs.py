@@ -69,6 +69,14 @@ def read_content_arg(text: str | None, file: str | None) -> str | None:
     return None
 
 
+def resolve_tags(tags_arg: str | None, existing_tags: list[str]) -> list[str]:
+    """Return the tag list to send: parsed --tags value if given, else existing
+    tags unchanged. Empty string clears all tags."""
+    if tags_arg is None:
+        return existing_tags
+    return [t.strip() for t in tags_arg.split(",") if t.strip()]
+
+
 # ---------- commands ----------
 
 def cmd_create(args):
@@ -94,11 +102,15 @@ def cmd_update(args):
     page_id = resolve_page_id(args.ref)
     replace = read_content_arg(args.replace, args.replace_file)
     append = read_content_arg(args.append, args.append_file)
-    if (replace is None) == (append is None):
-        die("pass exactly one of --replace/--replace-file/--append/--append-file")
+    if replace is not None and append is not None:
+        die("pass at most one of --replace/--replace-file/--append/--append-file")
+    if replace is None and append is None and args.tags is None:
+        die("pass --replace/--replace-file/--append/--append-file and/or --tags "
+            "(nothing to update)")
     # Wiki.js's update resolver maps over tags server-side; omitting them fails
-    # with "Cannot read properties of undefined (reading 'map')". Fetch and
-    # pass the existing tags back.
+    # with "Cannot read properties of undefined (reading 'map')". Fetch the
+    # current content/tags so resolve_tags() can replace, clear, or leave them
+    # unchanged, and so a tags-only update can resend the content unchanged.
     data = gql(
         "query($id: Int!) { pages { single(id: $id) { content tags { tag } } } }",
         {"id": page_id},
@@ -106,11 +118,14 @@ def cmd_update(args):
     page = data["pages"]["single"]
     if not page:
         die(f"page id {page_id} not found")
-    tags = [t["tag"] for t in page.get("tags") or []]
+    existing_tags = [t["tag"] for t in page.get("tags") or []]
+    tags = resolve_tags(args.tags, existing_tags)
     if append is not None:
         content = page["content"].rstrip("\n") + "\n\n" + append.rstrip("\n") + "\n"
-    else:
+    elif replace is not None:
         content = replace
+    else:
+        content = page["content"]
     data = gql(
         """mutation($id: Int!, $content: String!, $tags: [String]!) {
              pages { update(id: $id, content: $content, tags: $tags,
@@ -308,6 +323,11 @@ def main():
     p.add_argument("--replace-file")
     p.add_argument("--append")
     p.add_argument("--append-file")
+    p.add_argument(
+        "--tags",
+        help="comma-separated; replaces all existing tags. "
+             "Omit to leave tags unchanged; pass --tags \"\" to clear all tags.",
+    )
     p.set_defaults(func=cmd_update)
 
     p = sub.add_parser("get", help="print page content (metadata JSON on stderr)")
