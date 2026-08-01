@@ -1,0 +1,7 @@
+{
+  "name": "claude-wikijs-skill",
+  "version": "0.1.0",
+  "description": "Claude Code skill: CLI wrapper for a Wiki.js 2.x instance (pages, search, assets)",
+  "author": { "name": "Michael Paulukonis" },
+  "license": "MIT"
+}

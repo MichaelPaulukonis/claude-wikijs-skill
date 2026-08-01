@@ -1,0 +1,13 @@
+{
+  "name": "claude-wikijs-skill",
+  "description": "Development/distribution marketplace for the wikijs skill",
+  "owner": { "name": "Michael Paulukonis" },
+  "plugins": [
+    {
+      "name": "claude-wikijs-skill",
+      "description": "CLI wrapper for a Wiki.js 2.x instance",
+      "version": "0.1.0",
+      "source": "./"
+    }
+  ]
+}
