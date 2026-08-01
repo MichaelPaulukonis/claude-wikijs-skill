@@ -58,9 +58,10 @@ tags unchanged; pass `--tags ""` to clear all tags.
 
 ## Journaling
 
-This skill has no built-in journal convention. See `docs/journal-convention-example.md`
-in this plugin for one worked example you can copy and adapt - path format,
-title format, section structure, all of it is up to you.
+This skill has no built-in journal convention. See
+`${CLAUDE_PLUGIN_ROOT}/docs/journal-convention-example.md` for one worked
+example you can copy and adapt - path format, title format, section
+structure, all of it is up to you.
 
 ## Upload → embed example
 

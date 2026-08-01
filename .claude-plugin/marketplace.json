@@ -6,7 +6,7 @@
     {
       "name": "claude-wikijs-skill",
       "description": "CLI wrapper for a Wiki.js 2.x instance",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./"
     }
   ]

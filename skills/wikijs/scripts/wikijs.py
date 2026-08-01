@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Thin CLI wrapper for a personal Wiki.js 2.x instance.
+"""Thin CLI wrapper for a Wiki.js 2.x instance.
 
 Page CRUD + search via GraphQL; asset upload via the undocumented /u endpoint.
 Config: WIKIJS_API_URL (default http://localhost), WIKIJS_TOKEN (required).

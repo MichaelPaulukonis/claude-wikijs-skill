@@ -20,7 +20,16 @@ As a Claude Code plugin:
 /plugin install claude-wikijs-skill@claude-wikijs-skill
 ```
 
-Or manually: clone this repo and symlink/copy it into `~/.claude/skills/wikijs`.
+Or manually: clone this repo, then symlink/copy its inner `skills/wikijs/`
+directory (not the repo root) into `~/.claude/skills/wikijs`, e.g.:
+
+```bash
+git clone https://github.com/<owner>/claude-wikijs-skill.git /path/to/clone
+ln -s /path/to/clone/skills/wikijs ~/.claude/skills/wikijs
+```
+
+Either way, `wikijs.py` still needs `requirements.txt` installed (see Setup) -
+run `pip install -r /path/to/clone/requirements.txt` when installing manually.
 
 ## Setup
 
